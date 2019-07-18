@@ -60,6 +60,7 @@
          ];
     }
     else {
+        self.valid = false;
         self.myData = @[];
         [self.table reloadData];
     }

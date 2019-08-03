@@ -12,6 +12,8 @@
 @property (nonatomic) CLLocationManager * locManager;
 @property (nonatomic) MKPointAnnotation *curMarker;
 @property (nonatomic) MKMapView * myMap;
+@property (nonatomic) NSMutableArray<CLLocation *> *markers;
+
 @end
 
 @implementation MapViewController
@@ -32,11 +34,9 @@
 - (void)handleLongPress:(UILongPressGestureRecognizer *)longGR{
     NSLog(@"Long Press Detected");
     if(longGR.state == UIGestureRecognizerStateBegan){
-        [self.myMap removeAnnotation:self.curMarker];
         CGPoint touchPoint = [longGR locationInView:self.myMap];
-        self.curMarker = [[MKPointAnnotation alloc] init];
-        self.curMarker.coordinate = [_myMap convertPoint:touchPoint toCoordinateFromView:self.myMap];
-        [self.myMap addAnnotation:self.curMarker];
+        CLLocationCoordinate2D loc = [_myMap convertPoint:touchPoint toCoordinateFromView:self.myMap];
+        [self addMarker:loc];
     }
 }
 
@@ -59,12 +59,28 @@
                                               [self.myMap.bottomAnchor constraintEqualToAnchor:bound.bottomAnchor]]];
 }
 
-- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation{
+- (void)addMarker:(CLLocationCoordinate2D)location {
+    MKPointAnnotation *marker = [[MKPointAnnotation alloc] init];
+    marker.coordinate = location;
+    [self.myMap addAnnotation:marker];
+    CLLocation *loc = [[CLLocation alloc] initWithLatitude:marker.coordinate.latitude longitude:marker.coordinate.longitude];
+    [self.markers addObject:loc];
+}
+
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     MKPinAnnotationView *pin = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"board"];
     pin.animatesDrop = YES;
     pin.canShowCallout = YES;
     UIButton *showBtn = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-    [showBtn addTarget:self action:@selector(openLocation) forControlEvents:UIControlEventTouchUpInside];
+    showBtn.tag = 0;
+    for (CLLocation *i in self.markers) {
+        if(i.coordinate.longitude == annotation.coordinate.longitude && i.coordinate.longitude == annotation.coordinate.longitude){
+            showBtn.tag = [self.markers indexOfObject:i];
+            break;
+        }
+    }
+    [showBtn addTarget:self action:@selector(openLocation:) forControlEvents:UIControlEventTouchUpInside];
     pin.rightCalloutAccessoryView = showBtn;
     pin.calloutOffset = CGPointMake(-5, -10);
     UILabel *pinLabel = [[UILabel alloc] init];
@@ -73,9 +89,8 @@
     return pin;
 }
 
-- (void)openLocation{
-    NSLog(@"Image request received");
-    ImageViewController *IVC = [[ImageViewController alloc]initWithLocation:self.curMarker.coordinate];
+- (void)openLocation:(UIButton *)sender {
+    ImageViewController *IVC = [[ImageViewController alloc] initWithLocation:[[self.markers objectAtIndex:sender.tag] coordinate]];
     [self.navigationController pushViewController:IVC animated:YES];
 }
 

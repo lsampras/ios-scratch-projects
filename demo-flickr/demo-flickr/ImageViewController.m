@@ -65,7 +65,12 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     ImageCell * cell= [self.collectionView dequeueReusableCellWithReuseIdentifier:@"imageCell" forIndexPath:indexPath];
-    [cell setImageUrl:[self.myData objectAtIndex:indexPath.row]];
+    NSURLSessionDataTask *downTask = [self.session dataTaskWithURL:[self.myData objectAtIndex:indexPath.row] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [cell setImageData:data];
+        });
+    }];
+    [downTask resume];
     return cell;
 }
 

@@ -7,12 +7,16 @@
 //
 
 #import "MapViewController.h"
+#import "core data files/Marker+CoreDataClass.h"
+#import "AppDelegate.h"
 
 @interface MapViewController ()
 @property (nonatomic) CLLocationManager * locManager;
 @property (nonatomic) MKPointAnnotation *curMarker;
 @property (nonatomic) MKMapView * myMap;
 @property (nonatomic) NSMutableArray<CLLocation *> *markers;
+@property (nonatomic) NSManagedObjectContext *context;
+@property (nonatomic) NSMutableArray<Marker *> *markerData;
 
 @end
 
@@ -21,6 +25,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.locManager = [[CLLocationManager alloc] init];
+    self.context = [self managedContext];
     self.locManager.delegate = self;
     self.locManager.desiredAccuracy = kCLLocationAccuracyBest;
     [self.locManager requestWhenInUseAuthorization];
@@ -29,6 +34,8 @@
     UILongPressGestureRecognizer *longGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     self.myMap.delegate = self;
     [self.view addGestureRecognizer:longGR];
+    [self fetchData];
+//    self.markerData = [[NSMutableArray alloc] init];
 }
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)longGR{
@@ -36,12 +43,12 @@
     if(longGR.state == UIGestureRecognizerStateBegan){
         CGPoint touchPoint = [longGR locationInView:self.myMap];
         CLLocationCoordinate2D loc = [_myMap convertPoint:touchPoint toCoordinateFromView:self.myMap];
-        [self addMarker:loc];
+        [self saveMarker:loc];
     }
 }
 
 - (void)loadView :(CLLocationCoordinate2D)location{
-    CLLocationDistance radius = 1000;
+    CLLocationDistance radius = 100000;
     self.myMap = [[MKMapView alloc] initWithFrame:CGRectZero];
     MKCoordinateRegion  region = MKCoordinateRegionMakeWithDistance(location,radius, radius);
     [self.myMap setRegion:region animated:YES];
@@ -59,14 +66,12 @@
                                               [self.myMap.bottomAnchor constraintEqualToAnchor:bound.bottomAnchor]]];
 }
 
-- (void)addMarker:(CLLocationCoordinate2D)location {
+- (void)addMarker:(Marker *)location {
     MKPointAnnotation *marker = [[MKPointAnnotation alloc] init];
-    marker.coordinate = location;
+    marker.coordinate = CLLocationCoordinate2DMake(location.lat, location.lon);
+//    [self.markers addObject: [[CLLocation alloc] initWithLatitude:location.lat longitude:location.lon]];
     [self.myMap addAnnotation:marker];
-    CLLocation *loc = [[CLLocation alloc] initWithLatitude:marker.coordinate.latitude longitude:marker.coordinate.longitude];
-    [self.markers addObject:loc];
 }
-
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     MKPinAnnotationView *pin = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"board"];
@@ -74,8 +79,8 @@
     pin.canShowCallout = YES;
     UIButton *showBtn = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
     showBtn.tag = 0;
-    for (CLLocation *i in self.markers) {
-        if(i.coordinate.longitude == annotation.coordinate.longitude && i.coordinate.longitude == annotation.coordinate.longitude){
+    for (Marker *i in self.markerData) {
+        if(i.lon == annotation.coordinate.longitude && i.lat == annotation.coordinate.latitude){
             showBtn.tag = [self.markers indexOfObject:i];
             break;
         }
@@ -90,8 +95,52 @@
 }
 
 - (void)openLocation:(UIButton *)sender {
-    ImageViewController *IVC = [[ImageViewController alloc] initWithLocation:[[self.markers objectAtIndex:sender.tag] coordinate]];
+    ImageViewController *IVC = [[ImageViewController alloc] initWithLocation:[self.markerData objectAtIndex:sender.tag]];
     [self.navigationController pushViewController:IVC animated:YES];
+}
+
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [self saveContext];
+}
+
+#pragma mark - core data methods
+
+- (NSManagedObjectContext *)managedContext{
+    AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    return app.persistentContainer.viewContext;
+}
+
+- (void)fetchData{
+    NSFetchRequest *request = [Marker fetchRequest];
+    NSError *err = nil;
+    self.markerData = [NSMutableArray arrayWithArray:[self.context executeFetchRequest:request error:&err]];
+    if (err) {
+        abort();
+    }
+    for (Marker *i in self.markerData) {
+        [self addMarker:i];
+    }
+}
+
+
+- (void)saveMarker:(CLLocationCoordinate2D)location {
+    Marker *m = [[Marker alloc] initWithContext:self.context];
+    m.lat = location.latitude;
+    m.lon = location.longitude;
+    [self.markerData addObject:m];
+    [self addMarker:m];
+}
+
+- (void)saveContext {
+
+    NSError *error = nil;
+    if ([self.context hasChanges] && ![self.context save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        NSLog(@"MAPc: Unresolved error %@, %@", error, error.userInfo);
+        abort();
+    }
 }
 
 @end

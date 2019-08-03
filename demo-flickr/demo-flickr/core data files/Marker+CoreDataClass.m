@@ -11,4 +11,7 @@
 
 @implementation Marker
 
+- (CLLocationCoordinate2D)coordinate{
+    return CLLocationCoordinate2DMake(self.lat, self.lon);
+}
 @end

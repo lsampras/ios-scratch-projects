@@ -15,7 +15,7 @@
 	return [NSFetchRequest fetchRequestWithEntityName:@"Image"];
 }
 
-@dynamic image;
+@dynamic data;
 @dynamic url;
 @dynamic marker;
 

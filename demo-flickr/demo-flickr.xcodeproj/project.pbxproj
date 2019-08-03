@@ -102,14 +102,14 @@
 		5361563322F5B410004CBC0B /* core data files */ = {
 			isa = PBXGroup;
 			children = (
-				5361563722F5B493004CBC0B /* Marker+CoreDataProperties.h */,
-				5361563822F5B493004CBC0B /* Marker+CoreDataClass.h */,
-				5361563922F5B493004CBC0B /* Marker+CoreDataClass.m */,
-				5361563A22F5B493004CBC0B /* Marker+CoreDataProperties.m */,
-				5361563B22F5B493004CBC0B /* Image+CoreDataProperties.h */,
 				5361563C22F5B493004CBC0B /* Image+CoreDataClass.h */,
 				5361563D22F5B493004CBC0B /* Image+CoreDataClass.m */,
+				5361563B22F5B493004CBC0B /* Image+CoreDataProperties.h */,
 				5361563E22F5B493004CBC0B /* Image+CoreDataProperties.m */,
+				5361563822F5B493004CBC0B /* Marker+CoreDataClass.h */,
+				5361563922F5B493004CBC0B /* Marker+CoreDataClass.m */,
+				5361563722F5B493004CBC0B /* Marker+CoreDataProperties.h */,
+				5361563A22F5B493004CBC0B /* Marker+CoreDataProperties.m */,
 				5361563422F5B41F004CBC0B /* Model.xcdatamodeld */,
 			);
 			path = "core data files";

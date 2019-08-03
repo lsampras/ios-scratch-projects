@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSFetchRequest<Image *> *)fetchRequest;
 
-@property (nullable, nonatomic, retain) NSData *image;
+@property (nullable, nonatomic, retain) NSData *data;
 @property (nullable, nonatomic, copy) NSString *url;
 @property (nullable, nonatomic, retain) Marker *marker;
 

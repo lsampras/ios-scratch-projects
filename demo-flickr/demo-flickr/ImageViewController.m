@@ -7,42 +7,30 @@
 //
 
 #import "ImageViewController.h"
+#import "core data files/Marker+CoreDataClass.h"
+#import "core data files/Image+CoreDataClass.h"
 
 @interface ImageViewController ()
 
 @property (nonatomic) UILayoutGuide *bound;
-@property (nonatomic) NSMutableArray<NSURL *> * myData;
+@property (nonatomic) NSMutableArray<Image *> * myData;
 @property (nonatomic) NSURLSession *session;
 @property (nonatomic) BOOL isDownloaded;
+@property (nonatomic) Marker *marker;
+@property (nonatomic) NSManagedObjectContext *context;
 
 @end
 
 @implementation ImageViewController
 
-- (instancetype)initWithLocation:(CLLocationCoordinate2D) loc{
+- (instancetype)initWithLocation:(Marker *) loc{
+    self.marker =loc;
     UIStoryboard *storyBoard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
     self = [storyBoard instantiateViewControllerWithIdentifier:@"imageVC"];
     self.isDownloaded = false;
     self.myData = [[NSMutableArray alloc] init];
     self.session = [NSURLSession sharedSession];
-    int pageNum = arc4random_uniform(20);
-    int latMax = loc.latitude + 15;
-    int lonMax = loc.longitude + 15;
-    int latMin = loc.latitude - 15;
-    int lonMin = loc.longitude - 15;
-    int imageCount = 30;
-    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=APIKEYHERE&format=json&nojsoncallback=1&page=%d&per_page=%d&bbox=%d,%d,%d,%d&extras=url_m",pageNum,imageCount,lonMin,latMin,lonMax,latMax]];
-    NSURLSessionDataTask *dataTask = [self.session dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            for(int i =0;i<imageCount;i++){
-                NSString *temp =[NSString stringWithFormat:@"%@",json[@"photos"][@"photo"][i][@"url_m"]];
-                [self.myData addObject:[NSURL URLWithString:temp]];
-            }
-            [self.collectionView reloadData];
-        });
-    }];
-    [dataTask resume];
+ 
     return self;
 }
 
@@ -55,6 +43,37 @@
     }else{
         _bound = self.view.layoutMarginsGuide;
     }
+    int pageNum = arc4random_uniform(20);
+    int latMax = self.marker.lat + 15;
+    int lonMax = self.marker.lon + 15;
+    int latMin = self.marker.lat - 15;
+    int lonMin = self.marker.lon - 15;
+    int imageCount = 3;
+    self.myData = [NSMutableArray arrayWithArray:[self.marker.images_rel allObjects]];
+    if ([self.myData count]) {
+        
+    }
+    else {
+        NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=APIKEYHERE&format=json&nojsoncallback=1&page=%d&per_page=%d&bbox=%d,%d,%d,%d&extras=url_m",pageNum,imageCount,lonMin,latMin,lonMax,latMax]];
+        NSURLSessionDataTask *dataTask = [self.session dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                for(int i =0;i<imageCount;i++){
+                    NSString *temp =[NSString stringWithFormat:@"%@",json[@"photos"][@"photo"][i][@"url_m"]];
+                    Image *img = [[Image alloc] initWithContext:self.context];
+                    img.url = temp;
+                    [self.myData addObject:img];
+                }
+                [self.collectionView reloadData];
+            });
+        }];
+        [dataTask resume];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self saveContext];
 }
 
 #pragma mark - datasource methods
@@ -65,12 +84,22 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
     ImageCell * cell= [self.collectionView dequeueReusableCellWithReuseIdentifier:@"imageCell" forIndexPath:indexPath];
-    NSURLSessionDataTask *downTask = [self.session dataTaskWithURL:[self.myData objectAtIndex:indexPath.row] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [cell setImageData:data];
-        });
-    }];
-    [downTask resume];
+    Image *img = [self.myData objectAtIndex:indexPath.row];
+    
+    if (img.data) {
+        [cell setImageData:img.data];
+    }
+    else {
+        NSURLSessionDataTask *downTask = [self.session dataTaskWithURL:[NSURL URLWithString:img.url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                img.data = data;
+                img.marker = self.marker;
+                [self.marker addImages_relObject:img];
+                [cell setImageData:data];
+            });
+        }];
+        [downTask resume];
+    }
     return cell;
 }
 
@@ -86,6 +115,22 @@
     } completion:^(BOOL finished) {
         
     }];
+}
+
+
+#pragma mark - core data methods
+
+- (void)saveContext {
+    NSError *error = nil;
+    if ([self.context hasChanges] && ![self.context save:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        NSLog(@"MAPc: Unresolved error %@, %@", error, error.userInfo);
+        abort();
+    }
+}
+
+- (void)fetchData{
 }
 
 @end

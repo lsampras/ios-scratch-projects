@@ -36,21 +36,8 @@
     self.session = [NSURLSession sharedSession];
 }
 
-- (void)setImageUrl:(NSURL *)url{
-    
-    NSURLSessionDataTask *downTask = [self.session dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.imageView.image = [UIImage imageWithData:data];
-            if(self.imageView.image){
-                CGFloat aspectRatio = self.imageView.image.size.width/self.imageView.image.size.height;
-                self.aspectConstraint.active = false;
-                self.aspectConstraint = [self.imageView.widthAnchor constraintEqualToAnchor:self.imageView.heightAnchor multiplier:aspectRatio constant:0];
-                self.aspectConstraint.active = TRUE;
-            }else{
-            }
-        });
-    }];
-    [downTask resume];
+- (void)setImageData:(NSData *)data{
+    self.imageView.image = [UIImage imageWithData:data];
 }
 
 @end

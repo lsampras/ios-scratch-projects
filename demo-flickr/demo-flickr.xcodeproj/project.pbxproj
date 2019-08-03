@@ -16,6 +16,7 @@
 		534C7D9F22DF3F97008AFF10 /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 534C7D9E22DF3F97008AFF10 /* ImageViewController.m */; };
 		534C7DA122DF543C008AFF10 /* image.png in Resources */ = {isa = PBXBuildFile; fileRef = 534C7DA022DF543C008AFF10 /* image.png */; };
 		537847ED22E02DD000D61E1A /* ImageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 537847EC22E02DD000D61E1A /* ImageCell.m */; };
+		53B1A12522F56C94000F6B17 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 53B1A12322F56C94000F6B17 /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		534C7DA022DF543C008AFF10 /* image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = image.png; sourceTree = "<group>"; };
 		537847EB22E02DD000D61E1A /* ImageCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageCell.h; sourceTree = "<group>"; };
 		537847EC22E02DD000D61E1A /* ImageCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageCell.m; sourceTree = "<group>"; };
+		53B1A12422F56C94000F6B17 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +80,7 @@
 				534C7D8D22DF3C18008AFF10 /* Main.storyboard */,
 				534C7D9022DF3C1A008AFF10 /* Assets.xcassets */,
 				534C7D9222DF3C1A008AFF10 /* LaunchScreen.storyboard */,
+				53B1A12322F56C94000F6B17 /* Model.xcdatamodeld */,
 				534C7D9522DF3C1A008AFF10 /* Info.plist */,
 				534C7D9622DF3C1A008AFF10 /* main.m */,
 			);
@@ -158,6 +161,7 @@
 				534C7D8C22DF3C18008AFF10 /* MapViewController.m in Sources */,
 				537847ED22E02DD000D61E1A /* ImageCell.m in Sources */,
 				534C7D9722DF3C1A008AFF10 /* main.m in Sources */,
+				53B1A12522F56C94000F6B17 /* Model.xcdatamodeld in Sources */,
 				534C7D9F22DF3F97008AFF10 /* ImageViewController.m in Sources */,
 				534C7D8922DF3C18008AFF10 /* AppDelegate.m in Sources */,
 			);
@@ -302,6 +306,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q2Q75CJV2G;
 				INFOPLIST_FILE = "demo-flickr/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -309,6 +314,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "sampras.demo.demo-flickr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -318,6 +324,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q2Q75CJV2G;
 				INFOPLIST_FILE = "demo-flickr/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -325,6 +332,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "sampras.demo.demo-flickr";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -351,6 +359,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		53B1A12322F56C94000F6B17 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				53B1A12422F56C94000F6B17 /* Model.xcdatamodel */,
+			);
+			currentVersion = 53B1A12422F56C94000F6B17 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 534C7D7C22DF3C18008AFF10 /* Project object */;
 }

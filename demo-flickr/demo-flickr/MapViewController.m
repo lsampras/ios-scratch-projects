@@ -30,7 +30,9 @@
     self.locManager.desiredAccuracy = kCLLocationAccuracyBest;
     [self.locManager requestWhenInUseAuthorization];
     [self.locManager startUpdatingLocation];
-    [self loadView:[self.locManager location].coordinate];
+//    [self loadView:[self.locManager location].coordinate];
+    CLLocationCoordinate2D loc = CLLocationCoordinate2DMake(19.0974373,72.872313);
+    [self loadView:loc];
     UILongPressGestureRecognizer *longGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPress:)];
     self.myMap.delegate = self;
     [self.view addGestureRecognizer:longGR];
@@ -48,7 +50,7 @@
 }
 
 - (void)loadView :(CLLocationCoordinate2D)location{
-    CLLocationDistance radius = 100000;
+    CLLocationDistance radius = 10000;
     self.myMap = [[MKMapView alloc] initWithFrame:CGRectZero];
     MKCoordinateRegion  region = MKCoordinateRegionMakeWithDistance(location,radius, radius);
     [self.myMap setRegion:region animated:YES];
@@ -69,7 +71,6 @@
 - (void)addMarker:(Marker *)location {
     MKPointAnnotation *marker = [[MKPointAnnotation alloc] init];
     marker.coordinate = CLLocationCoordinate2DMake(location.lat, location.lon);
-//    [self.markers addObject: [[CLLocation alloc] initWithLatitude:location.lat longitude:location.lon]];
     [self.myMap addAnnotation:marker];
 }
 
@@ -81,7 +82,7 @@
     showBtn.tag = 0;
     for (Marker *i in self.markerData) {
         if(i.lon == annotation.coordinate.longitude && i.lat == annotation.coordinate.latitude){
-            showBtn.tag = [self.markers indexOfObject:i];
+            showBtn.tag = [self.markerData indexOfObject:i];
             break;
         }
     }

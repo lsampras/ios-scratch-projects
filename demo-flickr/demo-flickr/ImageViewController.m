@@ -9,6 +9,7 @@
 #import "ImageViewController.h"
 #import "core data files/Marker+CoreDataClass.h"
 #import "core data files/Image+CoreDataClass.h"
+#import "AppDelegate.h"
 
 @interface ImageViewController ()
 
@@ -24,13 +25,14 @@
 @implementation ImageViewController
 
 - (instancetype)initWithLocation:(Marker *) loc{
-    self.marker =loc;
+    
     UIStoryboard *storyBoard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
     self = [storyBoard instantiateViewControllerWithIdentifier:@"imageVC"];
     self.isDownloaded = false;
     self.myData = [[NSMutableArray alloc] init];
     self.session = [NSURLSession sharedSession];
- 
+    self.marker =loc;
+    self.context = [self managedContext];
     return self;
 }
 
@@ -58,6 +60,7 @@
         NSURLSessionDataTask *dataTask = [self.session dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                //TODO : handle cases where less images then imageCount are returned
                 for(int i =0;i<imageCount;i++){
                     NSString *temp =[NSString stringWithFormat:@"%@",json[@"photos"][@"photo"][i][@"url_m"]];
                     Image *img = [[Image alloc] initWithContext:self.context];
@@ -120,6 +123,11 @@
 
 #pragma mark - core data methods
 
+- (NSManagedObjectContext *)managedContext{
+    AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    return app.persistentContainer.viewContext;
+}
+
 - (void)saveContext {
     NSError *error = nil;
     if ([self.context hasChanges] && ![self.context save:&error]) {
@@ -128,9 +136,6 @@
         NSLog(@"MAPc: Unresolved error %@, %@", error, error.userInfo);
         abort();
     }
-}
-
-- (void)fetchData{
 }
 
 @end

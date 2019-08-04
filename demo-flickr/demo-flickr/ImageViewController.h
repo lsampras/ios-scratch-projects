@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "ImageCell.h"
 #import <CoreLocation/CoreLocation.h>
+#import "core data files/Marker+CoreDataClass.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithCoder:(NSCoder *)aDecoder NS_UNAVAILABLE;
 - (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil  NS_UNAVAILABLE;
-- (instancetype)initWithLocation :(CLLocationCoordinate2D) loc NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithLocation :(Marker *) loc NS_DESIGNATED_INITIALIZER;
 @end
 
 NS_ASSUME_NONNULL_END
